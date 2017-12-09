@@ -2,10 +2,10 @@ import requests
 
 import login_credentials
 
-spring_phase_order = ['O', 'R', 'B']
-fall_phase_order = ['O', 'R', 'B']
+spring_phase_order = ['O'] #['O', 'R', 'B']
+fall_phase_order = [] #['O', 'R', 'B']
 
-def download_order_images(session, partial_url, url_args_template):
+def download_order_images(game_name, session, partial_url, url_args_template):
     more_orders = True
     consecutive_failed = 0
 
@@ -21,7 +21,9 @@ def download_order_images(session, partial_url, url_args_template):
                 "gdate": spring,
                 "phase": phase,
             })
-            success = save_image_from_url(session, true_partial_url, "./images/first_image_test_{}_{}_{}.png".format(str(spring).zfill(3), counter, phase))    
+            file_path = "./images/{}_{}_{}_{}.png".format(game_name, str(spring).zfill(3), counter, phase)
+            print "Spring {}: ".format(phase),
+            success = save_image_from_url(session, true_partial_url, file_path)
             if success == False:
                 consecutive_failed += 1
             else:
@@ -33,7 +35,8 @@ def download_order_images(session, partial_url, url_args_template):
                 "gdate": fall,
                 "phase": phase,
             })
-            success = save_image_from_url(session, true_partial_url, "./images/first_image_test_{}_{}{}.png".format(str(fall).zfill(3), counter, phase))    
+            file_path = "./images/{}_{}_{}{}.png".format(game_name, str(fall).zfill(3), counter, phase)
+            success = save_image_from_url(session, true_partial_url, file_path)
             if success == False:
                 consecutive_failed += 1
             else:
@@ -57,6 +60,7 @@ def save_image_from_url(session, url, file_path):
     if not file_path:
         return False
 
+    print(url)
     image = download_image(session, url)
     if not image:
         return False
@@ -92,7 +96,7 @@ def save_image(image, file_path):
 def get_game_url(game_id):
     #url = "http://www.playdiplomacy.com/game_history.php?game_id={game_id}".format(game_id=game_id)
     #remaining_url_args = "&gdate={gdate}&phase={phase}"
-    partial_url = "http://www.playdiplomacy.com/games/7/{game_id}/game-history-{game_id}".format(game_id=game_id)
+    partial_url = "http://www.playdiplomacy.com/games/1/{game_id}/game-history-{game_id}".format(game_id=game_id)
     remaining_url_args = "-{gdate}-{phase}.png"
     return partial_url, remaining_url_args
 
@@ -111,6 +115,7 @@ def login(session):
 session = requests.Session()
 login(session)
 
-game_id = 78793
+game_id = 134848
+game_name = 'Nerds'
 partial_url, remaining_args_template = get_game_url(game_id)
-download_order_images(session, partial_url, remaining_args_template)
+download_order_images(game_name, session, partial_url, remaining_args_template)
